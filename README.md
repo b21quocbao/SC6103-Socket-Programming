@@ -55,25 +55,25 @@ sequenceDiagram
     User->>Server: 1. Query flights by source and destination
     Note over User,Server: Request Format: [src len][src][dest len][dest]
     alt Multiple flights found
-        Server-->>User: Response: [1][Success Msg][num flights][id][src len][src][dest len][dest][dep][fare][seat avail] (for each flight)
+        Server-->>User: Response: [1][msg len][Success Msg][num flights][id][src len][src][dest len][dest][dep][fare][seat avail] (for each flight)
     else No flights found
-        Server-->>User: Response: [0][Error Msg]
+        Server-->>User: Response: [0][msg len][Error Msg]
     end
 
     User->>Server: 2. Query flight details by id
     Note over User,Server: Request Format: [id]
     alt Flight exists
-        Server-->>User: Response: [1][Success Msg][id][src len][src][dest len][dest][dep][fare][seat avail]
+        Server-->>User: Response: [1][msg len][Success Msg][id][src len][src][dest len][dest][dep][fare][seat avail]
     else Flight does not exist
-        Server-->>User: Response: [0][Error Msg]
+        Server-->>User: Response: [0][msg len][Error Msg]
     end
 
     User->>Server: 3. Reserve seats by id and number of seats
     Note over User,Server: Request Format: [id][num seats]
     alt Reservation successful
-        Server-->>User: Response: [1][Success Msg][id][src len][src][dest len][dest][dep][fare][updated seat avail]
+        Server-->>User: Response: [1][msg len][Success Msg][id][src len][src][dest len][dest][dep][fare][updated seat avail]
     else Incorrect input or insufficient seats
-        Server-->>User: Response: [0][Error Msg]
+        Server-->>User: Response: [0][msg len][Error Msg]
     end
 
     User->>Server: 4. Register for seat avail updates
@@ -81,27 +81,28 @@ sequenceDiagram
     Server->>Server: Record client address, port, flight ID, monitor interval
     loop During monitor interval
         alt Seat reservation made
-            Server-->>User: Response: [1][Updated Msg][id][src len][src][dest len][dest][dep][fare][updated seat avail]
+            Server-->>User: Response: [1][msg len][Updated Msg][id][src len][src][dest len][dest][dep][fare][updated seat avail]
         end
     end
     Server->>Server: Remove client record after monitor interval expires
-    Server-->>User: Response: [0][Monitor Interval Expired Msg]
+    Server-->>User: Response: [0][msg len][Monitor Interval Expired Msg]
 
     User->>Server: 5. Query flights by source and airfare range
     Note over User,Server: Request Format: [src len][src][min fare][max fare]
     alt Multiple flights found within range
-        Server-->>User: Response: [1][Success Msg][num flights][id][src len][src][dest len][dest][dep][fare][seat avail] (for each flight)
+        Server-->>User: Response: [1][msg len][Success Msg][num flights][id][src len][src][dest len][dest][dep][fare][seat avail] (for each flight)
     else No flights found within range
-        Server-->>User: Response: [0][Error Msg]
+        Server-->>User: Response: [0][msg len][Error Msg]
     end
 
     User->>Server: 6. Delay flight by id and duration in Ms
     Note over User,Server: Request Format: [id][delay in Ms]
     alt Flight exists and delay applied
-        Server-->>User: Response: [1][Success Msg][id][src len][src][dest len][dest][new dep][fare][seat avail]
+        Server-->>User: Response: [1][msg len][Success Msg][id][src len][src][dest len][dest][new dep][fare][seat avail]
     else Flight does not exist
-        Server-->>User: Response: [0][Error Msg]
+        Server-->>User: Response: [0][msg len][Error Msg]
     end
+
 ```
 
 ### Shortened Variable Names Explanation
