@@ -104,6 +104,9 @@ sequenceDiagram
     end
 
 ```
+### Prepend message
+- Each request/reply needs to prepend [messageType][requestId][serviceType]
+
 ### Shortened Variable Names Explanation
 
 1. **identifier** → `id`
