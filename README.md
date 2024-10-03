@@ -104,7 +104,6 @@ sequenceDiagram
     end
 
 ```
-
 ### Shortened Variable Names Explanation
 
 1. **identifier** → `id`
@@ -120,6 +119,15 @@ sequenceDiagram
 11. **Updated Message** → `Updated Msg`
 
 These abbreviations are used in the mermaid diagram to make the request and response format more concise and readable.
+
+### Note for Request/Response Format:
+
+- **0/1 (Success/Error)**: 1 byte (8 bits)
+- **String length fields (e.g., msg len, src len, dest len)**: 32 bits (4 bytes) for each string length
+- **fare**: Double-precision floating-point value (64 bits, 8 bytes)
+- **id, seat avail, dep (departure time in Ms)**: 32-bit integers (4 bytes each)
+
+This note ensures clarity for the size and format of all string length fields and other key values in the request and response structure.
 
 ## License
 
