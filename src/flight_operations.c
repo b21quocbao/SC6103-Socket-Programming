@@ -108,7 +108,6 @@ void query_flights_by_src_dest(uint8_t *input, size_t input_len, uint8_t *output
     printf("Extracted: dest=%s\n", dest);
 
     int num_flights = 0;
-    size_t out_offset = 0;
 
     // Check each flight
     for (int i = 0; i < flight_count; i++)
@@ -116,21 +115,26 @@ void query_flights_by_src_dest(uint8_t *input, size_t input_len, uint8_t *output
         if (strncmp(flight_db[i].src, src, src_len) == 0 && strncmp(flight_db[i].dest, dest, dest_len) == 0)
         {
             num_flights++;
-            serialize_flight(&flight_db[i], output + out_offset, output_len);
-            out_offset += *output_len;
         }
     }
 
     if (num_flights > 0)
     {
-        output[3] = SUCCESS;
+        prepend_msg(output, SUCCESS, "Flights found", output_len);
     }
     else
     {
-        output[3] = ERROR;
+        prepend_msg(output, ERROR, "No flights matched destination and source", output_len);
     }
 
-    *output_len = out_offset;
+    // Check each flight
+    for (int i = 0; i < flight_count; i++)
+    {
+        if (strncmp(flight_db[i].src, src, src_len) == 0 && strncmp(flight_db[i].dest, dest, dest_len) == 0)
+        {
+            serialize_flight(&flight_db[i], output, output_len);
+        }
+    }
 }
 
 void query_flight_by_id(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len)
@@ -146,15 +150,13 @@ void query_flight_by_id(uint8_t *input, size_t input_len, uint8_t *output, size_
     {
         if (flight_db[i].id == flight_id)
         {
-            output[3] = SUCCESS;
-            serialize_flight(&flight_db[i], output + 1, output_len);
-            *output_len += 1;
+            prepend_msg(output, SUCCESS, "Flight found", output_len);
+            serialize_flight(&flight_db[i], output, output_len);
             return;
         }
     }
 
-    output[3] = ERROR; // Flight not found
-    *output_len = 3;
+    prepend_msg(output, ERROR, "Flight not found", output_len);
 }
 
 void reserve_seats(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len)
@@ -178,21 +180,18 @@ void reserve_seats(uint8_t *input, size_t input_len, uint8_t *output, size_t *ou
             if (flight_db[i].seat_avail >= num_seats)
             {
                 flight_db[i].seat_avail -= num_seats;
-                output[3] = SUCCESS;
-                serialize_flight(&flight_db[i], output + 1, output_len);
-                *output_len += 1;
+                prepend_msg(output, SUCCESS, "Reserved successfully", output_len);
+                serialize_flight(&flight_db[i], output, output_len);
             }
             else
             {
-                output[3] = ERROR;
-                *output_len = 3;
+                prepend_msg(output, ERROR, "Seats available below your demands", output_len);
             }
             return;
         }
     }
 
-    output[3] = ERROR; // Flight not found
-    *output_len = 3;
+    prepend_msg(output, ERROR, "Flight not found", output_len);
 }
 
 // Simulating a client registering for seat updates
@@ -211,8 +210,7 @@ void register_for_seat_updates(uint8_t *input, size_t input_len, uint8_t *output
     {
         if (flight_db[i].id == flight_id)
         {
-            output[3] = SUCCESS;
-            serialize_flight(&flight_db[i], output + 1, output_len);
+            serialize_flight(&flight_db[i], output, output_len);
             *output_len += 1;
 
             // Simulate waiting for updates (e.g., for monitor_duration ms)
@@ -223,8 +221,7 @@ void register_for_seat_updates(uint8_t *input, size_t input_len, uint8_t *output
         }
     }
 
-    output[3] = ERROR; // Flight not found
-    *output_len = 3;
+    prepend_msg(output, ERROR, "Flight not found", output_len);
 }
 
 void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len)
@@ -251,7 +248,6 @@ void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *
     offset += sizeof(max_fare);
 
     int num_flights = 0;
-    size_t out_offset = 0;
 
     // Check each flight
     for (int i = 0; i < flight_count; i++)
@@ -259,21 +255,26 @@ void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *
         if (strncmp(flight_db[i].src, src, src_len) == 0 && flight_db[i].fare >= min_fare && flight_db[i].fare <= max_fare)
         {
             num_flights++;
-            serialize_flight(&flight_db[i], output + out_offset, output_len);
-            out_offset += *output_len;
         }
     }
 
     if (num_flights > 0)
     {
-        output[3] = SUCCESS;
+        prepend_msg(output, SUCCESS, "Flights found", output_len);
     }
     else
     {
-        output[3] = ERROR;
+        prepend_msg(output, ERROR, "No flights matched source and fare", output_len);
     }
 
-    *output_len = out_offset;
+    // Check each flight
+    for (int i = 0; i < flight_count; i++)
+    {
+        if (strncmp(flight_db[i].src, src, src_len) == 0 && flight_db[i].fare >= min_fare && flight_db[i].fare <= max_fare)
+        {
+            serialize_flight(&flight_db[i], output, output_len);
+        }
+    }
 }
 
 void delay_flight(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len)
@@ -295,13 +296,13 @@ void delay_flight(uint8_t *input, size_t input_len, uint8_t *output, size_t *out
         if (flight_db[i].id == flight_id)
         {
             flight_db[i].dep += delay_ms; // Add delay to departure time
-            output[3] = SUCCESS;
-            serialize_flight(&flight_db[i], output + 1, output_len);
-            *output_len += 1;
+            
+            prepend_msg(output, ERROR, "Flight delayed successfully", output_len);
+            serialize_flight(&flight_db[i], output, output_len);
+
             return;
         }
     }
 
-    output[3] = ERROR; // Flight not found
-    *output_len = 3;
+    prepend_msg(output, ERROR, "Flight not found", output_len);
 }
