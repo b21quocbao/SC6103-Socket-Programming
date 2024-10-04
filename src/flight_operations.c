@@ -130,7 +130,7 @@ void query_flights_by_src_dest(uint8_t *input, size_t input_len, uint8_t *output
         return;
     }
 
-    memcpy(output + *output_len, &num_flights, sizeof(num_flights));
+    memcpy(output + *output_len, htonl(num_flights), sizeof(num_flights));
     *output_len += sizeof(num_flights);
 
     // Check each flight
@@ -274,7 +274,7 @@ void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *
         return;
     }
 
-    memcpy(output + *output_len, &num_flights, sizeof(num_flights));
+    memcpy(output + *output_len, htonl(num_flights), sizeof(num_flights));
     *output_len += sizeof(num_flights);
 
     // Check each flight

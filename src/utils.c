@@ -55,7 +55,7 @@ void prepend_msg(uint8_t *buffer, uint8_t status, char* msg, size_t *len) {
     *len += 1;
     
     uint32_t msg_len = strlen(msg);
-    memcpy(buffer + *len, &msg_len, sizeof(msg_len));
+    memcpy(buffer + *len, htonl(msg_len), sizeof(msg_len));
     *len += sizeof(msg_len);
 
     memcpy(buffer + *len, msg, msg_len);
