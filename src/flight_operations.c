@@ -87,15 +87,19 @@ void query_flights_by_src_dest(uint8_t *input, size_t input_len, uint8_t *output
 
   // Extract source and destination from input
   memcpy(&src_len, input + offset, sizeof(src_len));
+  src_len = ntohl(src_len);
   offset += sizeof(src_len);
   printf("Extracted: src_len=%d\n", src_len);
+
   memcpy(src, input + offset, src_len);
   offset += src_len;
   printf("Extracted: src=%s\n", src);
 
   memcpy(&dest_len, input + offset, sizeof(dest_len));
+  dest_len = ntohl(dest_len);
   offset += sizeof(dest_len);
   printf("Extracted: dest_len=%d\n", dest_len);
+  
   memcpy(dest, input + offset, dest_len);
   offset += dest_len;
   printf("Extracted: dest=%s\n", dest);
@@ -133,6 +137,7 @@ void query_flight_by_id(uint8_t *input, size_t input_len, uint8_t *output, size_
 
   // Extract flight id from input
   memcpy(&flight_id, input + offset, sizeof(flight_id));
+  flight_id = ntohl(flight_id);
 
   for (int i = 0; i < flight_count; i++)
   {
@@ -156,8 +161,11 @@ void reserve_seats(uint8_t *input, size_t input_len, uint8_t *output, size_t *ou
 
   // Extract flight id and number of seats from input
   memcpy(&flight_id, input + offset, sizeof(flight_id));
+  flight_id = ntohl(flight_id);
   offset += sizeof(flight_id);
+
   memcpy(&num_seats, input + offset, sizeof(num_seats));
+  num_seats = ntohl(num_seats);
   offset += sizeof(num_seats);
 
   for (int i = 0; i < flight_count; i++)
@@ -192,6 +200,7 @@ void register_for_seat_updates(uint8_t *input, size_t input_len, uint8_t *output
 
   // Extract flight id from input
   memcpy(&flight_id, input + offset, sizeof(flight_id));
+  flight_id = ntohl(flight_id);
   offset += sizeof(flight_id);
 
   // Simulate monitoring for seat availability updates (this would be an ongoing process)
@@ -224,12 +233,18 @@ void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *
 
   // Extract source length, source string, min fare, and max fare from input
   memcpy(&src_len, input + offset, sizeof(src_len));
+  src_len = ntohl(src_len);
   offset += sizeof(src_len);
+
   memcpy(src, input + offset, src_len);
   offset += src_len;
+
   memcpy(&min_fare, input + offset, sizeof(min_fare));
+  min_fare = ntohl(min_fare);
   offset += sizeof(min_fare);
+
   memcpy(&max_fare, input + offset, sizeof(max_fare));
+  max_fare = ntohl(max_fare);
   offset += sizeof(max_fare);
 
   int num_flights = 0;
@@ -265,8 +280,11 @@ void delay_flight(uint8_t *input, size_t input_len, uint8_t *output, size_t *out
 
   // Extract flight id and delay time from input
   memcpy(&flight_id, input + offset, sizeof(flight_id));
+  flight_id = ntohl(flight_id);
   offset += sizeof(flight_id);
+
   memcpy(&delay_ms, input + offset, sizeof(delay_ms));
+  delay_ms = ntohl(delay_ms);
   offset += sizeof(delay_ms);
 
   for (int i = 0; i < flight_count; i++)
