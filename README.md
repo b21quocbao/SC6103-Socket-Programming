@@ -4,12 +4,12 @@ This project demonstrates a simple client-server application using socket progra
 
 ## Prerequisites
 
-Ensure that you have `g++` and `gcc` installed on your system. You can install them using the following commands:
+Ensure that you have `g++`, `gcc` and `makke` installed on your system. You can install them using the following commands:
 
 ### For Ubuntu/WSL:
 ```bash
 sudo apt update
-sudo apt install g++ gcc
+sudo apt install g++ gcc make
 ```
 
 ## Setup and Usage
@@ -19,30 +19,7 @@ To set up the server, follow these steps:
 
 1. Compile and run the server:
    ```bash
-   g++ -o build/server server.cpp && ./build/server
-   ```
-
-### 2. Client Setup
-To set up the client, follow these steps:
-
-1. Compile and run the client:
-   ```bash
-   g++ -o build/client client.cpp && ./build/client
-   ```
-
-2. Enter the server host:
-   ```bash
-   Enter server host: localhost
-   ```
-
-3. Enter the server port:
-   ```bash
-   Enter server port: 3000
-   ```
-
-4. Enter your name:
-   ```bash
-   Enter your name: John
+   make all && ./flight_reservation_system
    ```
 
 ## Diagram
