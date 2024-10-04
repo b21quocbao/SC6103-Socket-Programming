@@ -8,12 +8,12 @@ void serialize_flight(Flight *flight, uint8_t *buffer, size_t *len)
 {
     // Copy id
     uint32_t htonl_id = htonl(flight->id);
-    memcpy(buffer + *len, htonl_id, sizeof(flight->id));
+    memcpy(buffer + *len, &htonl_id, sizeof(flight->id));
     *len += sizeof(flight->id);
 
     // Copy src length
     uint32_t htonl_src_len = htonl(flight->src_len);
-    memcpy(buffer + *len, htonl_src_len, sizeof(flight->src_len));
+    memcpy(buffer + *len, &htonl_src_len, sizeof(flight->src_len));
     *len += sizeof(flight->src_len);
 
     // Copy src string
@@ -22,7 +22,7 @@ void serialize_flight(Flight *flight, uint8_t *buffer, size_t *len)
 
     // Copy dest length
     uint32_t htonl_dest_len = htonl(flight->dest_len);
-    memcpy(buffer + *len, htonl_dest_len, sizeof(flight->dest_len));
+    memcpy(buffer + *len, &htonl_dest_len, sizeof(flight->dest_len));
     *len += sizeof(flight->dest_len);
 
     // Copy dest string
