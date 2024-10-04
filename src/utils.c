@@ -40,7 +40,7 @@ void extract_header(const uint8_t *request, uint8_t *messageType, uint8_t *reque
 void prepend_header(uint8_t messageType, uint8_t requestId, uint8_t serviceType, uint8_t *response, size_t *response_len)
 {
     // Prepend the three extracted values to the start of the response
-    response[0] = messageType;
+    response[0] = 1;
     response[1] = requestId;
     response[2] = serviceType;
 

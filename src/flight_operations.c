@@ -127,7 +127,11 @@ void query_flights_by_src_dest(uint8_t *input, size_t input_len, uint8_t *output
     else
     {
         prepend_msg(output, ERROR, "No flights matched destination and source", output_len);
+        return;
     }
+
+    memcpy(output + *output_len, &num_flights, sizeof(num_flights));
+    *output_len += sizeof(num_flights);
 
     // Check each flight
     for (int i = 0; i < flight_count; i++)
@@ -267,7 +271,11 @@ void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *
     else
     {
         prepend_msg(output, ERROR, "No flights matched source and fare", output_len);
+        return;
     }
+
+    memcpy(output + *output_len, &num_flights, sizeof(num_flights));
+    *output_len += sizeof(num_flights);
 
     // Check each flight
     for (int i = 0; i < flight_count; i++)
