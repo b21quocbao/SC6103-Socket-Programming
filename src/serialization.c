@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <netinet/in.h>
 #include "types/flight.h"
 
 void serialize_flight(Flight *flight, uint8_t *buffer, size_t *len)
