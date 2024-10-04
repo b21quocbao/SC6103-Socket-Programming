@@ -88,13 +88,17 @@ void query_flights_by_src_dest(uint8_t *input, size_t input_len, uint8_t *output
   // Extract source and destination from input
   memcpy(&src_len, input + offset, sizeof(src_len));
   offset += sizeof(src_len);
+  printf("Extracted: src_len=%d\n", src_len);
   memcpy(src, input + offset, src_len);
   offset += src_len;
+  printf("Extracted: src=%s\n", src);
 
   memcpy(&dest_len, input + offset, sizeof(dest_len));
   offset += sizeof(dest_len);
+  printf("Extracted: dest_len=%d\n", dest_len);
   memcpy(dest, input + offset, dest_len);
   offset += dest_len;
+  printf("Extracted: dest=%s\n", dest);
 
   int num_flights = 0;
   size_t out_offset = 0;
