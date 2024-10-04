@@ -78,7 +78,7 @@ void receiver(int port)
             break;
         }
 
-        printf("\nLength: %d. Response: [", response_len);
+        printf("\nLength: %ld. Response: [", response_len);
         for (int i = 0; i < response_len; ++i) {
             printf("%d, ", response[i]);
         }
