@@ -12,7 +12,7 @@
 void receiver(int port)
 {
     int SIZE = 1000;
-    size_t response_len;
+    size_t response_len = 0;
     uint8_t request[SIZE];
     uint8_t response[SIZE];
 
@@ -78,7 +78,7 @@ void receiver(int port)
             break;
         }
 
-        printf("\nResponse: [");
+        printf("\nLength: %d. Response: [", response_len);
         for (int i = 0; i < response_len; ++i) {
             printf("%d, ", response[i]);
         }

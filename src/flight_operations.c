@@ -49,7 +49,9 @@ void seed_flight_data()
 
             // Randomly select a source and destination from the cities array
             strcpy(flight_db[j * 20 + i].src, cities[i % 20]);
+            flight_db[j * 20 + i].src_len = strlen(cities[i % 20]);
             strcpy(flight_db[j * 20 + i].dest, cities[(i + 1) % 20]);
+            flight_db[j * 20 + i].dest_len = strlen(cities[(i + 1) % 20]);
 
             // Generate a random departure time (within the next 30 days)
             flight_db[j * 20 + i].dep = random_departure_time();
