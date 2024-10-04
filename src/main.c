@@ -78,6 +78,12 @@ void receiver(int port)
             break;
         }
 
+        printf("\nResponse: [");
+        for (int i = 0; i < response_len; ++i) {
+            printf("%d, ", response[i]);
+        }
+        printf("]\n");
+
         if ((n = sendto(s, response, response_len, 0, (struct sockaddr *)&aSocketAddress, aLength)) < 0)
         {
             perror("Send back");
@@ -89,8 +95,8 @@ void receiver(int port)
 
 int main()
 {
-    // Seed flight data for 20 flights
-    seed_flight_data(20);
+    // Seed flight data
+    seed_flight_data();
 
     // Print the seeded flight data
     print_flight_data();

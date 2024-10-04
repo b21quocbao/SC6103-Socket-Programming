@@ -6,7 +6,7 @@
 #define SUCCESS 1
 #define ERROR 0
 
-void seed_flight_data(int num_flights);
+void seed_flight_data();
 void print_flight_data();
 void query_flights_by_src_dest(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len);
 void query_flight_by_id(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len);
