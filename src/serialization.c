@@ -7,11 +7,13 @@
 void serialize_flight(Flight *flight, uint8_t *buffer, size_t *len)
 {
     // Copy id
-    memcpy(buffer + *len, htonl(flight->id), sizeof(flight->id));
+    uint32_t htonl_id = htonl(flight->id);
+    memcpy(buffer + *len, htonl_id, sizeof(flight->id));
     *len += sizeof(flight->id);
 
     // Copy src length
-    memcpy(buffer + *len, htonl(flight->src_len), sizeof(flight->src_len));
+    uint32_t htonl_src_len = htonl(flight->src_len);
+    memcpy(buffer + *len, htonl_src_len, sizeof(flight->src_len));
     *len += sizeof(flight->src_len);
 
     // Copy src string
@@ -19,7 +21,8 @@ void serialize_flight(Flight *flight, uint8_t *buffer, size_t *len)
     *len += flight->src_len;
 
     // Copy dest length
-    memcpy(buffer + *len, htonl(flight->dest_len), sizeof(flight->dest_len));
+    uint32_t htonl_dest_len = htonl(flight->dest_len);
+    memcpy(buffer + *len, htonl_dest_len, sizeof(flight->dest_len));
     *len += sizeof(flight->dest_len);
 
     // Copy dest string
@@ -27,7 +30,8 @@ void serialize_flight(Flight *flight, uint8_t *buffer, size_t *len)
     *len += flight->dest_len;
 
     // Copy departure time
-    memcpy(buffer + *len, htonl(flight->dep), sizeof(flight->dep));
+    uint32_t htonl_dep = htonl(flight->dep);
+    memcpy(buffer + *len, &htonl_dep, sizeof(flight->dep));
     *len += sizeof(flight->dep);
 
     // Copy fare (double)
@@ -35,7 +39,8 @@ void serialize_flight(Flight *flight, uint8_t *buffer, size_t *len)
     *len += sizeof(flight->fare);
 
     // Copy seat availability
-    memcpy(buffer + *len, htonl(flight->seat_avail), sizeof(flight->seat_avail));
+    uint32_t htonl_seat_avail = htonl(flight->seat_avail);
+    memcpy(buffer + *len, &htonl_seat_avail, sizeof(flight->seat_avail));
     *len += sizeof(flight->seat_avail);
 }
 
