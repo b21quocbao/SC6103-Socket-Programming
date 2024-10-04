@@ -41,24 +41,24 @@ void seed_flight_data()
     {
         for (int j = 0; j < 3; j++)
         {
-            flight_db[i].id = i + 1; // Unique flight IDs starting from 1
+            flight_db[j * 20 + i].id = j * 20 + i; // Unique flight IDs starting from 1
 
             // Allocate memory for source and destination cities
-            flight_db[i].src = malloc(50 * sizeof(char));
-            flight_db[i].dest = malloc(50 * sizeof(char));
+            flight_db[j * 20 + i].src = malloc(50 * sizeof(char));
+            flight_db[j * 20 + i].dest = malloc(50 * sizeof(char));
 
             // Randomly select a source and destination from the cities array
-            strcpy(flight_db[i].src, cities[i % 20]);
-            strcpy(flight_db[i].dest, cities[(i + 1) % 20]);
+            strcpy(flight_db[j * 20 + i].src, cities[i % 20]);
+            strcpy(flight_db[j * 20 + i].dest, cities[(i + 1) % 20]);
 
             // Generate a random departure time (within the next 30 days)
-            flight_db[i].dep = random_departure_time();
+            flight_db[j * 20 + i].dep = random_departure_time();
 
             // Generate a random airfare between $100 and $1000
-            flight_db[i].fare = random_fare(100.0, 1000.0);
+            flight_db[j * 20 + i].fare = random_fare(100.0, 1000.0);
 
             // Generate a random number of available seats between 50 and 200
-            flight_db[i].seat_avail = random_int(50, 200);
+            flight_db[j * 20 + i].seat_avail = random_int(50, 200);
         }
     }
 
