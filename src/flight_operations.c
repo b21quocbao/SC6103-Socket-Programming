@@ -246,7 +246,17 @@ void register_for_seat_updates(int sockfd, struct sockaddr_in *client_addr, sock
     offset += sizeof(monitor_time_ms);
     printf("Extracted: monitor_time_ms=%d\n", monitor_time_ms);
 
-    add_client_for_seat_updates(sockfd, client_addr, client_len, flight_id, monitor_time_ms);
+    for (int i = 0; i < flight_count; i++)
+    {
+        if (flight_db[i].id == flight_id)
+        {
+            // Sending callback to registered clients
+            prepend_msg(output, SUCCESS, "Registered successfully", output_len);
+            add_client_for_seat_updates(sockfd, client_addr, client_len, flight_id, monitor_time_ms);
+
+            return;
+        }
+    }
 
     prepend_msg(output, ERROR, "Flight not found", output_len);
 }
