@@ -253,6 +253,7 @@ void register_for_seat_updates(int sockfd, struct sockaddr_in *client_addr, sock
             // Sending callback to registered clients
             prepend_msg(output, SUCCESS, "Registered successfully", output_len);
             add_client_for_seat_updates(sockfd, client_addr, client_len, flight_id, monitor_time_ms);
+            serialize_flight(&flight_db[i], output, output_len);
 
             return;
         }
