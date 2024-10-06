@@ -25,29 +25,29 @@ void makeReceiverSA(struct sockaddr_in *sa, int port)
     sa->sin_addr.s_addr = htonl(INADDR_ANY);
 }
 
-// Extracts [messageType][requestId][serviceType] from the request
-void extract_header(const uint8_t *request, uint8_t *messageType, uint8_t *requestId, uint8_t *serviceType)
+// Extracts [message_type][request_id][service_type] from the request
+void extract_header(const uint8_t *request, uint8_t *message_type, uint8_t *request_id, uint8_t *service_type)
 {
     // Assuming request is valid and contains at least 3 bytes
-    *messageType = request[0]; // Extract messageType (1 byte)
-    *requestId = request[1];   // Extract requestId (1 byte)
-    *serviceType = request[2]; // Extract serviceType (1 byte)
+    *message_type = request[0]; // Extract message_type (1 byte)
+    *request_id = request[1];   // Extract request_id (1 byte)
+    *service_type = request[2]; // Extract service_type (1 byte)
 
-    printf("Extracted: messageType=%d, requestId=%d, serviceType=%d\n", *messageType, *requestId, *serviceType);
+    printf("Extracted: message_type=%d, request_id=%d, service_type=%d\n", *message_type, *request_id, *service_type);
 }
 
-// Prepends [messageType][requestId][serviceType] to the response
-void prepend_header(uint8_t messageType, uint8_t requestId, uint8_t serviceType, uint8_t *response, size_t *response_len)
+// Prepends [message_type][request_id][service_type] to the response
+void prepend_header(uint8_t message_type, uint8_t request_id, uint8_t service_type, uint8_t *response, size_t *response_len)
 {
     // Prepend the three extracted values to the start of the response
     response[0] = 1;
-    response[1] = requestId;
-    response[2] = serviceType;
+    response[1] = request_id;
+    response[2] = service_type;
 
     // Adjust the response length to account for the prepended 3-byte header
     *response_len += 3;
 
-    printf("Prepended: messageType=%d, requestId=%d, serviceType=%d\n", messageType, requestId, serviceType);
+    printf("Prepended: message_type=%d, request_id=%d, service_type=%d\n", message_type, request_id, service_type);
 }
 
 void prepend_msg(uint8_t *buffer, uint8_t status, char* msg, size_t *len) {

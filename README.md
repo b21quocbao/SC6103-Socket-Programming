@@ -82,7 +82,7 @@ sequenceDiagram
 
 ```
 ### Prepend message
-- Each request/reply needs to prepend `[messageType][requestId][serviceType]`
+- Each request/reply needs to prepend `[message_type][request_id][service_type]`
 
 ### Shortened Variable Names Explanation
 

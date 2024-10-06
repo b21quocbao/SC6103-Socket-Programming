@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include "utils.h"
 #include "serialization.h"
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include "socket_client.h"
 
 #define SUCCESS 1
 #define ERROR 0
@@ -10,11 +14,22 @@
 #define MAX_FLIGHTS 100
 Flight flight_db[MAX_FLIGHTS];
 int flight_count = 0;
+uint8_t callback_output[1000];
+size_t callback_output_len = 0;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+// Function to swap byte order for a double (8 bytes)
+double swap_double(double value) {
+    double result;
+    uint8_t *source = (uint8_t*)&value;
+    uint8_t *dest = (uint8_t*)&result;
+
+    // Swap the bytes
+    for (int i = 0; i < sizeof(double); i++) {
+        dest[i] = source[sizeof(double) - 1 - i];
+    }
+
+    return result;
+}
 
 // Utility function to generate random departure time (Unix timestamp)
 uint32_t random_departure_time()
@@ -152,6 +167,7 @@ void query_flight_by_id(uint8_t *input, size_t input_len, uint8_t *output, size_
     // Extract flight id from input
     memcpy(&flight_id, input + offset, sizeof(flight_id));
     flight_id = ntohl(flight_id);
+    printf("Extracted: flight_id=%d\n", flight_id);
 
     for (int i = 0; i < flight_count; i++)
     {
@@ -166,19 +182,25 @@ void query_flight_by_id(uint8_t *input, size_t input_len, uint8_t *output, size_
     prepend_msg(output, ERROR, "Flight not found", output_len);
 }
 
-void reserve_seats(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len)
+void reserve_seats(int sockfd, uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len)
 {
     uint32_t flight_id, num_seats;
     size_t offset = 3;
+
+    // Prepare callback message
+    callback_output_len = 0;
+    prepend_header(1, 0, 4, callback_output, &callback_output_len);
 
     // Extract flight id and number of seats from input
     memcpy(&flight_id, input + offset, sizeof(flight_id));
     flight_id = ntohl(flight_id);
     offset += sizeof(flight_id);
+    printf("Extracted: flight_id=%d\n", flight_id);
 
     memcpy(&num_seats, input + offset, sizeof(num_seats));
     num_seats = ntohl(num_seats);
     offset += sizeof(num_seats);
+    printf("Extracted: num_seats=%d\n", num_seats);
 
     for (int i = 0; i < flight_count; i++)
     {
@@ -189,6 +211,11 @@ void reserve_seats(uint8_t *input, size_t input_len, uint8_t *output, size_t *ou
                 flight_db[i].seat_avail -= num_seats;
                 prepend_msg(output, SUCCESS, "Reserved successfully", output_len);
                 serialize_flight(&flight_db[i], output, output_len);
+
+                // Sending callback to registered clients
+                prepend_msg(callback_output, SUCCESS, "Seat reservation made", &callback_output_len);
+                serialize_flight(&flight_db[i], callback_output, &callback_output_len);
+                send_seat_update_to_client(sockfd, callback_output, callback_output_len, flight_id);
             }
             else
             {
@@ -202,31 +229,24 @@ void reserve_seats(uint8_t *input, size_t input_len, uint8_t *output, size_t *ou
 }
 
 // Simulating a client registering for seat updates
-void register_for_seat_updates(uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len, uint32_t monitor_duration)
+void register_for_seat_updates(int sockfd, struct sockaddr_in *client_addr, socklen_t client_len, uint8_t *input, size_t input_len, uint8_t *output, size_t *output_len, uint32_t monitor_duration)
 {
-    uint32_t flight_id;
+    uint32_t flight_id, monitor_time_ms;
     size_t offset = 3;
 
     // Extract flight id from input
     memcpy(&flight_id, input + offset, sizeof(flight_id));
     flight_id = ntohl(flight_id);
     offset += sizeof(flight_id);
+    printf("Extracted: flight_id=%d\n", flight_id);
 
-    // Simulate monitoring for seat availability updates (this would be an ongoing process)
-    for (int i = 0; i < flight_count; i++)
-    {
-        if (flight_db[i].id == flight_id)
-        {
-            serialize_flight(&flight_db[i], output, output_len);
-            *output_len += 1;
+    // Extract flight id from input
+    memcpy(&monitor_time_ms, input + offset, sizeof(monitor_time_ms));
+    monitor_time_ms = ntohl(monitor_time_ms);
+    offset += sizeof(monitor_time_ms);
+    printf("Extracted: monitor_time_ms=%d\n", monitor_time_ms);
 
-            // Simulate waiting for updates (e.g., for monitor_duration ms)
-            // In a real-world app, this would block the client from sending new requests until monitoring ends.
-            printf("Monitoring seat availability for flight %d...\n", flight_id);
-            // You can simulate the waiting period here.
-            return;
-        }
-    }
+    add_client_for_seat_updates(sockfd, client_addr, client_len, flight_id, monitor_time_ms);
 
     prepend_msg(output, ERROR, "Flight not found", output_len);
 }
@@ -242,17 +262,21 @@ void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *
     memcpy(&src_len, input + offset, sizeof(src_len));
     src_len = ntohl(src_len);
     offset += sizeof(src_len);
+    printf("Extracted: src_len=%d\n", src_len);
 
     memcpy(src, input + offset, src_len);
     offset += src_len;
+    printf("Extracted: src=%s\n", src);
 
     memcpy(&min_fare, input + offset, sizeof(min_fare));
-    min_fare = ntohl(min_fare);
+    min_fare = swap_double(min_fare);
     offset += sizeof(min_fare);
+    printf("Extracted: min_fare=%f\n", min_fare);
 
     memcpy(&max_fare, input + offset, sizeof(max_fare));
-    max_fare = ntohl(max_fare);
+    max_fare = swap_double(max_fare);
     offset += sizeof(max_fare);
+    printf("Extracted: max_fare=%f\n", max_fare);
 
     int num_flights = 0;
 
@@ -264,6 +288,7 @@ void query_flights_by_src_fare_range(uint8_t *input, size_t input_len, uint8_t *
             num_flights++;
         }
     }
+    printf("Result: num_flights=%d\n", num_flights);
 
     if (num_flights > 0)
     {
@@ -298,16 +323,18 @@ void delay_flight(uint8_t *input, size_t input_len, uint8_t *output, size_t *out
     memcpy(&flight_id, input + offset, sizeof(flight_id));
     flight_id = ntohl(flight_id);
     offset += sizeof(flight_id);
+    printf("Extracted: flight_id=%d\n", flight_id);
 
     memcpy(&delay_ms, input + offset, sizeof(delay_ms));
     delay_ms = ntohl(delay_ms);
     offset += sizeof(delay_ms);
+    printf("Extracted: delay_ms=%d\n", delay_ms);
 
     for (int i = 0; i < flight_count; i++)
     {
         if (flight_db[i].id == flight_id)
         {
-            flight_db[i].dep += delay_ms; // Add delay to departure time
+            flight_db[i].dep += delay_ms / 1000; // Add delay to departure time
             
             prepend_msg(output, ERROR, "Flight delayed successfully", output_len);
             serialize_flight(&flight_db[i], output, output_len);
