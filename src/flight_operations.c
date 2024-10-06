@@ -336,7 +336,7 @@ void delay_flight(uint8_t *input, size_t input_len, uint8_t *output, size_t *out
         {
             flight_db[i].dep += delay_ms / 1000; // Add delay to departure time
             
-            prepend_msg(output, ERROR, "Flight delayed successfully", output_len);
+            prepend_msg(output, SUCCESS, "Flight delayed successfully", output_len);
             serialize_flight(&flight_db[i], output, output_len);
 
             return;
