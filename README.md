@@ -4,12 +4,12 @@ This project demonstrates a simple client-server application using socket progra
 
 ## Prerequisites
 
-Ensure that you have `g++`, `gcc` and `makke` installed on your system. You can install them using the following commands:
+Ensure that you have `g++`, `gcc`, `jdk`, `jre` and `make` installed on your system. You can install them using the following commands:
 
 ### For Ubuntu/WSL:
 ```bash
 sudo apt update
-sudo apt install g++ gcc make
+sudo apt install g++ gcc make openjdk-21-jre-headless openjdk-21-jdk-headless
 ```
 
 ## Setup and Usage
@@ -20,6 +20,14 @@ To set up the server, follow these steps:
 1. Compile and run the server:
    ```bash
    make all && ./flight_reservation_system
+   ```
+
+### 2. Client Setup
+To set up the client, follow these steps:
+
+1. Compile and run the client:
+   ```bash
+   cd Client/src && javac *.java && java Main
    ```
 
 ## Diagram
