@@ -5,9 +5,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "socket_server.h"
 #include "flight_operations.h"
 #include "utils.h"
+#include "filter_request.h"
+
+bool duplicate_filtering = false;
 
 void receiver(int port)
 {
@@ -42,6 +46,19 @@ void receiver(int port)
 
         // Prepend message_type, request_id, service_type to response
         prepend_header(message_type, request_id, service_type, response, &response_len);
+
+        if (duplicate_filtering)
+        {
+            RequestEntry *found_entry = find_request(request_id);
+            if (found_entry != NULL)
+            {
+                // send the found entry to client
+                if ((n = sendto(sockfd, found_entry->response, found_entry->response_len, 0, (struct sockaddr *)&client_address, client_len)) < 0)
+                {
+                    perror("Send back");
+                }
+            }
+        }
 
         // Process request based on service type
         switch (service_type)
@@ -84,6 +101,11 @@ void receiver(int port)
             printf("%d, ", response[i]);
         }
         printf("]\n\n");
+
+        if (duplicate_filtering)
+        {
+            store_request(request_id, response, response_len);
+        }
 
         if ((n = sendto(sockfd, response, response_len, 0, (struct sockaddr *)&client_address, client_len)) < 0)
         {
