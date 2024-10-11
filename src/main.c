@@ -116,8 +116,16 @@ void receiver(int port)
     close(sockfd);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    // Check if a flag for duplciate filtering is passed as an argument to the program
+    if (argc > 1 && strcmp(argv[1], "--filter") == 0)
+    {
+        duplicate_filtering = true; // Set the flag ON if "--filter" argument is provided
+    }
+
+    printf("duplicate_filtering %d\n", duplicate_filtering);
+
     // Seed flight data
     seed_flight_data();
 
