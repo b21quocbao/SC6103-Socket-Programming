@@ -7,5 +7,5 @@ typedef struct
     size_t response_len;
 } RequestEntry;
 
-RequestEntry* find_request(uint8_t request_id);
-void store_request(uint8_t request_id, const uint8_t *response, size_t response_len);
+RequestEntry* find_request(struct sockaddr_in *client_addr, uint8_t request_id);
+void store_request(struct sockaddr_in *client_addr, uint8_t request_id, const uint8_t *response, size_t response_len);

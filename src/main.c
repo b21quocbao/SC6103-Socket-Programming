@@ -49,7 +49,7 @@ void receiver(int port)
 
         if (duplicate_filtering)
         {
-            RequestEntry *found_entry = find_request(request_id);
+            RequestEntry *found_entry = find_request(&client_address, request_id);
             if (found_entry != NULL)
             {
                 // send the found entry to client
@@ -104,7 +104,7 @@ void receiver(int port)
 
         if (duplicate_filtering)
         {
-            store_request(request_id, response, response_len);
+            store_request(&client_address, request_id, response, response_len);
         }
 
         if ((n = sendto(sockfd, response, response_len, 0, (struct sockaddr *)&client_address, client_len)) < 0)
