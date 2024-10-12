@@ -46,8 +46,6 @@ void prepend_header(uint8_t message_type, uint8_t request_id, uint8_t service_ty
 
     // Adjust the response length to account for the prepended 3-byte header
     *response_len += 3;
-
-    printf("Prepended: message_type=%d, request_id=%d, service_type=%d\n", message_type, request_id, service_type);
 }
 
 void prepend_msg(uint8_t *buffer, uint8_t status, char* msg, size_t *len) {

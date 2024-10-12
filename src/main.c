@@ -49,18 +49,19 @@ void receiver(int port)
 
         if (duplicate_filtering)
         {
-            RequestEntry *found_entry = find_request(&client_address, request_id);
-            if (found_entry != NULL)
+            int index = find_request(&client_address, request_id);
+            if (index != -1)
             {
+                RequestEntry found_entry = request_map[index];
                 printf("Duplicated request_id\n");
-                printf("Length: %ld. Response: [", found_entry->response_len);
-                for (int i = 0; i < found_entry->response_len; ++i)
+                printf("Length: %ld. Response: [", found_entry.response_len);
+                for (int i = 0; i < found_entry.response_len; ++i)
                 {
-                    printf("%d, ", found_entry->response[i]);
+                    printf("%d, ", found_entry.response[i]);
                 }
                 printf("]\n\n");
                 // send the found entry to client
-                if ((n = sendto(sockfd, found_entry->response, found_entry->response_len, 0, (struct sockaddr *)&client_address, client_len)) < 0)
+                if ((n = sendto(sockfd, found_entry.response, found_entry.response_len, 0, (struct sockaddr *)&client_address, client_len)) < 0)
                 {
                     perror("Send back");
                 }
@@ -133,6 +134,7 @@ int main(int argc, char *argv[])
     }
 
     printf("duplicate_filtering %d\n", duplicate_filtering);
+    printf("Length: %ld. Response: [%d", request_map[0].response_len, request_map[0].response[0]);
 
     // Seed flight data
     seed_flight_data();
