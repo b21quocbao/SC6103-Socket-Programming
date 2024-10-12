@@ -34,6 +34,7 @@ RequestEntry* find_request(struct sockaddr_in *client_addr, uint8_t request_id)
     {
         if (strcmp(request_map[i].ip_address, ip_address) == 0 && request_map[i].request_id == request_id)
         {
+            printf("Retrieved response_len %d", request_map[i].response_len);
             return &request_map[i]; // Return the index if found
         }
     }
@@ -50,5 +51,6 @@ void store_request(struct sockaddr_in *client_addr, uint8_t request_id, const ui
     request_map[entry_count].response = (uint8_t *)malloc(response_len); // Allocate memory for the response
     memcpy(request_map[entry_count].response, response, response_len);
     request_map[entry_count].response_len = response_len;
+    printf("Stored response_len %d", request_map[entry_count].response_len);
     entry_count++;
 }
