@@ -49,23 +49,26 @@ void receiver(int port)
 
         if (duplicate_filtering)
         {
-            int index = find_request(&client_address, request_id);
-            if (index != -1)
-            {
-                RequestEntry found_entry = request_map[index];
-                printf("Duplicated request_id\n");
-                printf("Length: %ld. Response: [", found_entry.response_len);
-                for (int i = 0; i < found_entry.response_len; ++i)
+            // non-idempotent operations only
+            if (service_type == 3 || service_type == 6) {
+                int index = find_request(&client_address, request_id);
+                if (index != -1)
                 {
-                    printf("%d, ", found_entry.response[i]);
+                    RequestEntry found_entry = request_map[index];
+                    printf("Duplicated request_id\n");
+                    printf("Length: %ld. Response: [", found_entry.response_len);
+                    for (int i = 0; i < found_entry.response_len; ++i)
+                    {
+                        printf("%d, ", found_entry.response[i]);
+                    }
+                    printf("]\n\n");
+                    // send the found entry to client
+                    if ((n = sendto(sockfd, found_entry.response, found_entry.response_len, 0, (struct sockaddr *)&client_address, client_len)) < 0)
+                    {
+                        perror("Send back");
+                    }
+                    continue;
                 }
-                printf("]\n\n");
-                // send the found entry to client
-                if ((n = sendto(sockfd, found_entry.response, found_entry.response_len, 0, (struct sockaddr *)&client_address, client_len)) < 0)
-                {
-                    perror("Send back");
-                }
-                continue;
             }
         }
 
