@@ -117,10 +117,7 @@ These abbreviations are used in the mermaid diagram to make the request and resp
 
 This note ensures clarity for the size and format of all string length fields and other key values in the request and response structure.
 
-## License
+## Members
+Zhen Zilong | G2404878K | <https://github.com/SNDZIL>
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-Thanks to the open-source community for providing excellent resources and documentation on socket programming in C++.
+Ngo Quoc Bao | G2404379H | <https://github.com/b21quocbao>
