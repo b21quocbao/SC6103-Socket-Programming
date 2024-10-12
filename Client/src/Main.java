@@ -1,3 +1,6 @@
+
+// main function
+// run this to start the client
 public class Main {
     public static void main(String[] args) {
         try {

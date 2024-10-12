@@ -1,5 +1,6 @@
 import java.util.Arrays;
 
+// store the response data
 public class ReplyData {
     private byte msgType;
     private int requestId;
@@ -8,7 +9,7 @@ public class ReplyData {
     private String message;
     private FlightData[] flights;
 
-    // 成功响应
+    // response is successful, for multiple flights
     public ReplyData(byte msgType, int requestId, int serviceType, String message, FlightData[] flights) {
         this.msgType = msgType;
         this.requestId = requestId;
@@ -18,7 +19,7 @@ public class ReplyData {
         this.flights = flights;
     }
 
-    // 构造方法用于处理单个航班，将其转化为数组
+    // response is successful, for single flights
     public ReplyData(byte msgType, int requestId, int serviceType, String message, FlightData flightData) {
         this.msgType = msgType;
         this.requestId = requestId;
@@ -27,13 +28,14 @@ public class ReplyData {
         this.flights = new FlightData[]{flightData};  // 单个航班数据转化为数组
     }
 
-    // 错误响应
+    // response fail
     public ReplyData(byte msgType, int requestId, int serviceType, String message) {
         this.msgType = msgType;
         this.requestId = requestId;
         this.serviceType = serviceType;
         this.message = message;
     }
+
 
     @Override
     public String toString() {
@@ -53,5 +55,9 @@ public class ReplyData {
 
     public FlightData[] getFlights() {
         return flights;
+    }
+
+    public int getRequestId() {
+        return requestId;
     }
 }

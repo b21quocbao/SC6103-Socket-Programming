@@ -16,14 +16,14 @@ public class Client {
     public Client(String serverIp, int serverPort) throws Exception {
         this.serverIP = InetAddress.getByName(serverIp);
         this.serverPort = serverPort;
-        this.clientSocket = new DatagramSocket();  // 随机创建UDP socket
+        this.clientSocket = new DatagramSocket();  // build a UDP socket
         this.requestID = 0;
-        // 设置超时时间
-        clientSocket.setSoTimeout(1000);  // 处理超时重传逻辑
+        // timeout interval
+        clientSocket.setSoTimeout(5000);
     }
 
 
-    // 发送消息
+    // send Msg
     public void sendRequest(byte msgType, byte serviceType, byte[] msgBody) throws Exception {
         byte reqId = getRequestId();
         ByteBuffer buffer = ByteBuffer.allocate(3 + msgBody.length);
@@ -38,7 +38,7 @@ public class Client {
         clientSocket.send(sendPacket);
     }
 
-    // 接收消息
+    // receive Msg
     public byte[]  receiveReply() throws Exception {
         byte[] receiveData = new byte[1024];
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -48,15 +48,17 @@ public class Client {
         int dataLength = receivePacket.getLength();
         byte[] actualData = new byte[dataLength];
         System.arraycopy(receivePacket.getData(), 0, actualData, 0, dataLength);
+//        System.out.println("Receive byte array as numbers: " + Arrays.toString(actualData));
 
         return actualData;
 
     }
 
     public ReplyData unmarshalReply(byte[] receivedBytes) throws Exception {
-        return ResponseParser.parseResponse(receivedBytes);
+        return ResponseParser.parseResponse(receivedBytes, this);
     }
 
+    // callback function
     public void callbackMonitor(int interval) throws Exception {
         long startTime = System.currentTimeMillis();
         System.out.println("Waiting for callback from server...");
@@ -85,13 +87,13 @@ public class Client {
         return requestID;
     }
 
+    //requestID ++
     public void transmitRequest() {
         requestID++;
     }
 
 
 
-    // 关闭客户端
     public void close() {
         if (clientSocket != null && !clientSocket.isClosed()) {
             clientSocket.close();

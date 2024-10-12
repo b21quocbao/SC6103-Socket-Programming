@@ -1,6 +1,8 @@
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+// build the request body
+
 public class RequestBuilder {
     // Query flights by source and destination
     public static byte[] buildQueryFlights(String source, String destination) {

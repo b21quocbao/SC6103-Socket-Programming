@@ -1,5 +1,5 @@
 import java.util.Date;
-
+// store flight data
 public class FlightData {
     private int id;
     private String src;

@@ -1,17 +1,16 @@
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 import java.net.SocketTimeoutException;
 
 public class CLI {
     private Client client;
     private InputHandler inputHandler;
-//    private String serverIP = "192.168.1.104";
-    private String serverIP = "20.2.218.136";
-    private int serverPort = 3000;
+//    private String serverIP = "10.91.155.181";
+    private String serverIP = "20.2.218.136";  //server IP
+    private int serverPort = 3000;  //server port
 
-    private int totalTimes = 5;  // 超时重传次数
-//    private int retryInterval = 1000;  // 超时重传间隔
+    private int totalTimes = 5;  // timeout count
+    private int retryInterval = 5000;  // timeout interval
 
     public CLI() throws Exception {
         this.client = new Client(serverIP, serverPort);
@@ -71,16 +70,16 @@ public class CLI {
 
     private boolean requestTimeoutMonitor(byte msgType, byte serviceType, byte[] msgBody) {
         int currentTimes = 0;
-        client.transmitRequest();
+        client.transmitRequest();      //+1 for requestId
 
         while (currentTimes < totalTimes) {
             try {
-                // 发送消息
+                // transmit the message
                 client.sendRequest(msgType, serviceType, msgBody);
                 System.out.println("Sent message to " + serverIP + ":" + serverPort);
                 currentTimes++;
 
-                // 等待接收服务器响应
+                // wait for the response from server
                 byte[] rawResponse = client.receiveReply();
                 if (rawResponse != null) {
                     ReplyData response = client.unmarshalReply(rawResponse);
@@ -88,11 +87,20 @@ public class CLI {
                     if(response.getFlights() == null){
                         return false;
                     }
-                    return true;  // 成功收到响应后，退出方法
+                    return true;  // receive the response successfully
                 }
             } catch (SocketTimeoutException e) {
-                // 如果超时但未达到总超时，则重传请求
+                // timeout. retransmitting
                 System.out.println("No response received, retransmitting...");
+            } catch (IllegalStateException e) {
+                // wrong requestId
+                System.out.println(e.getMessage()+", retransmitting...");
+                try {
+                    Thread.sleep(retryInterval);  // 等待 5 秒后再次重传
+                } catch (InterruptedException e1) {
+                    System.out.println("Thread interrupted: " + e1.getMessage());
+                    return false;
+                }
             } catch (UnknownHostException e) {
                 System.out.println("Invalid server IP address: " + e.getMessage());
                 return false;
@@ -104,7 +112,6 @@ public class CLI {
                 return false;
             }
 
-//            // 如果在这次循环中没有收到响应，等待 retryInterval 时间后重试
 //            try {
 //                Thread.sleep(retryInterval);  // 等待 1 秒后再次重传
 //            } catch (InterruptedException e) {
@@ -113,7 +120,7 @@ public class CLI {
 //            }
         }
 
-        // 重传5次后仍未收到响应，返回超时错误
+        // after 5 tries for retransmission, return false
         System.out.println("Operation timed out, please try again later.");
         System.out.println("--------------------------------------------------------");
         System.out.println();
@@ -122,22 +129,21 @@ public class CLI {
 
 
 
-    // 调用 RequestBuilder 构建请求并发送
+    // Invoke RequestBuilder build buffer and send it
     private void queryFlights() throws Exception {
         String source = inputHandler.getStringInput("Enter source: ");
         String destination = inputHandler.getStringInput("Enter destination: ");
         byte[] requestPayload = RequestBuilder.buildQueryFlights(source, destination);
 
-        // 调用 sendRequest 发送数据
-        requestTimeoutMonitor((byte) 0, (byte)1, requestPayload);  // serviceType 为 1
+        // invoke sendRequest send msg
+        requestTimeoutMonitor((byte) 0, (byte)1, requestPayload);  // serviceType is 1
     }
 
     private void queryFlightDetails() throws Exception {
         int flightId = inputHandler.getIntInput("Enter flight ID: ");
         byte[] requestPayload = RequestBuilder.buildQueryFlightDetails(flightId);
 
-        // 调用 sendRequest 发送数据
-        requestTimeoutMonitor((byte) 0, (byte)2, requestPayload);  // serviceType 为 2
+        requestTimeoutMonitor((byte) 0, (byte)2, requestPayload);  // serviceType is 2
     }
 
     private void reserveSeats() throws Exception {
@@ -145,17 +151,16 @@ public class CLI {
         int numSeats = inputHandler.getIntInput("Enter number of seats: ");
         byte[] requestPayload = RequestBuilder.buildReserveSeats(flightId, numSeats);
 
-        // 调用 sendRequest 发送数据
-        requestTimeoutMonitor((byte) 0, (byte)3, requestPayload);  // serviceType 为 3
+        requestTimeoutMonitor((byte) 0, (byte)3, requestPayload);  // serviceType is 3
     }
 
     private void seatRegister() throws Exception {
         int flightId = inputHandler.getIntInput("Enter flight ID: ");
-        int monitor = inputHandler.getIntInput("Enter time interval: ");
+        int monitor = inputHandler.getIntInput("Enter time interval (in ms): ");
         byte[] requestPayload = RequestBuilder.buildSeatRegister(flightId, monitor);
 
-        if (requestTimeoutMonitor((byte) 0, (byte)4, requestPayload))   // serviceType 为 4
-            client.callbackMonitor(monitor);
+        if (requestTimeoutMonitor((byte) 0, (byte)4, requestPayload))   // serviceType is 4
+            client.callbackMonitor(monitor + 1000);
     }
 
     private void queryFlightsByAirfareRange() throws Exception {
@@ -164,14 +169,14 @@ public class CLI {
         double maxFare = inputHandler.getDoubleInput("Enter maximum flight fare: ");
         byte[] requestPayload = RequestBuilder.buildQueryFlightsByAirfareRange(source, minFare, maxFare);
 
-        requestTimeoutMonitor((byte) 0, (byte)5, requestPayload);  // serviceType 为 5
+        requestTimeoutMonitor((byte) 0, (byte)5, requestPayload);  // serviceType is 5
     }
 
     private void delayFlights() throws Exception {
         int flightId = inputHandler.getIntInput("Enter flight ID: ");
-        int delayMs = inputHandler.getIntInput("Enter delay time: ");
+        int delayMs = inputHandler.getIntInput("Enter delay time (in ms): ");
         byte[] requestPayload = RequestBuilder.buildDelayFlights(flightId, delayMs);
 
-        requestTimeoutMonitor((byte) 0, (byte)6, requestPayload);  // serviceType 为 6
+        requestTimeoutMonitor((byte) 0, (byte)6, requestPayload);  // serviceType is 6
     }
 }

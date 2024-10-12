@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+// handle the input information
 public class InputHandler {
     private Scanner scanner;
 
@@ -7,6 +8,7 @@ public class InputHandler {
         this.scanner = new Scanner(System.in);
     }
 
+    // string input
     public String getStringInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
@@ -19,6 +21,7 @@ public class InputHandler {
 //        }
     }
 
+    // int input
     public int getIntInput(String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -30,6 +33,7 @@ public class InputHandler {
         }
     }
 
+    // double input
     public double getDoubleInput(String prompt) {
         while (true) {
             System.out.print(prompt);
