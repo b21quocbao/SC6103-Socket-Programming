@@ -52,7 +52,8 @@ void receiver(int port)
             RequestEntry *found_entry = find_request(&client_address, request_id);
             if (found_entry != NULL)
             {
-                printf("Duplicated request_id. Length: %ld. Response: [", found_entry->response_len);
+                printf("Duplicated request_id\n");
+                printf("Length: %ld. Response: [", found_entry->response_len);
                 for (int i = 0; i < found_entry->response_len; ++i)
                 {
                     printf("%d, ", found_entry->response[i]);
