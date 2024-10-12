@@ -27,6 +27,8 @@ RequestEntry* find_request(struct sockaddr_in *client_addr, uint8_t request_id)
 {
     char ip_address[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &(client_addr->sin_addr), ip_address, INET_ADDRSTRLEN);
+
+    printf("Extracted: ip_address=%s\n", ip_address);
     
     for (int i = 0; i < entry_count; ++i)
     {
